@@ -1,0 +1,210 @@
+<div *ngIf="voirListesMedicaments">
+    <h2 style="text-align: center;">Listes des médicaments</h2>
+    <button type="button" class="btn rounded-pill btn-primary" (click)="afficherFormulaireAjouter()">Ajouter</button>
+    <br>
+    <form class="form-horizontal">
+        <div class="form-group ">
+            <label class="control-label col-sm-2 " for="recherche">Recherchez un libelle:</label>
+            <div class="col-sm-4 ">
+                <input type="search" class="form-control" name="recherche" [(ngModel)]="recherche" autocomplete="on" id="recherche" placeholder="Le libelle du médicament">
+            </div>
+
+            <!--<div class="col-sm-4 ">
+                <button type="submit" class="btn rounded-pill btn-primary">Recherchez</button>
+            </div>-->
+        </div>
+    </form>
+    <table class="table table-condensed">
+        <thead>
+            <tr>
+                <th>Numero</th>
+                <th>Libelle</th>
+                <th>Prix unitaire</th>
+                <th>Quantité</th>
+                <th>Catégorie</th>
+                <th>Date peremption</th>
+                <th style="text-align: center;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let medicament of medicaments |filter:recherche; let i = index ">
+                <td>{{ i+1 }}</td>
+                <td>{{ medicament.libelle }}</td>
+                <td>{{ medicament.prixUnitaire }}</td>
+                <td>{{ medicament.quantite }}</td>
+                <td>{{ medicament.categorie }}</td>
+                <td>{{ medicament.datePeremption | date: "yyyy-dd-MM" }}</td>
+                <td style="text-align: center;">
+                    <button type="button" class="btn btn-info" (click)="afficherPageDetail(medicament.id)">Detail</button>
+                    <button type="button" class="btn btn-warning" (click)="afficherFormulaireModifier(medicament.id)">Modifier</button>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal1">Supprimer 1</button>
+                    <button type="button" class="btn btn-danger" data-toggle="modal" data-target="#myModal2">Supprimer 2</button>
+                    <!-- Modal -->
+                    <div class="modal fade" id="myModal1" role="dialog">
+                        <div class="modal-dialog">
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Suppression d'un médicament</h4>
+                                </div>
+                                <div class="modal-body" style="text-align:center;">
+                                    <p>Cette action est irréversible.</p>
+                                    <p>Vous êtes sûr de vouloir supprimer cet médicament ?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-success" data-dismiss="modal">Non</button>
+                                    <button type="button" (click)="supprimerParClePrimaire(medicament.id)" class="btn btn-danger" data-dismiss="modal">Oui</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="myModal2" role="dialog">
+                        <div class="modal-dialog">
+                            <!-- Modal content-->
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                    <h4 class="modal-title">Suppression d'un médicament</h4>
+                                </div>
+                                <div class="modal-body" style="text-align:center;">
+                                    <p>Cette action est irréversible.</p>
+                                    <p>Vous êtes sûr de vouloir supprimer cet médicament ?</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-success" data-dismiss="modal">Non</button>
+                                    <button type="button" (click)="supprimerMedicament(medicament)" class="btn btn-danger" data-dismiss="modal">Oui</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <h4>Nombres d'occurences de médicament : {{ nombres }}</h4>
+</div>
+
+<div *ngIf="voirFormulaireAjout">
+    <h2>Ajout d'un médicament</h2>
+    <button type=" button" class="btn rounded-pill btn-success" (click)="retour()">Retour</button>
+    <div *ngIf="!erreur" class="alert alert-danger">{{ messageErreur }}</div>
+    <form class="form-horizontal" [formGroup]="medicamentForm" (ngSubmit)="ajouterMedicament()">
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="libelle">Libelle:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="libelle" placeholder="Le libelle du médicament" name="libelle" formControlName="libelle" [(ngModel)]="medicament.libelle" required>
+                <div class="alert alert-danger" [hidden]="libelle.valid || libelle.pristine && !libelle.touched ">Le libelle est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="prixUnitaire">Prix unitaire:</label>
+            <div class="col-sm-10">
+                <input type="number" class="form-control " id="prixUnitaire" name="prixUnitaire " formControlName="prixUnitaire" [(ngModel)]="medicament.prixUnitaire" required>
+                <div class="alert alert-danger" [hidden]="prixUnitaire.valid || prixUnitaire.pristine && !prixUnitaire.touched">Le prix unitaire est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="quantite ">Quantité:</label>
+            <div class="col-sm-10">
+                <input type="number" class="form-control" id="quantite" name="quantite" formControlName="quantite" [(ngModel)]="medicament.quantite" required>
+                <div class="alert alert-danger" [hidden]="quantite.valid || quantite.pristine && !quantite.touched">La quantité est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="categorie ">Catégorie:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="categorie" placeholder="La categorie du médicament" name="categorie" formControlName="categorie" [(ngModel)]="medicament.categorie" required>
+                <div class="alert alert-danger" [hidden]="categorie.valid || categorie.pristine && !categorie.touched">La catégorie est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="datePeremption">Date peremption:</label>
+            <div class="col-sm-10 ">
+                <input type="date" class="form-control" id="datePeremption" name="datePeremption" formControlName="datePeremption" [(ngModel)]="medicament.datePeremption" required>
+                <div class="alert alert-danger" [hidden]="datePeremption.valid || datePeremption.pristine && !datePeremption.touched">La date est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" [disabled]="medicamentForm.invalid" class="btn btn-primary ">Enregistrer</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="!voirFormulaireModification">
+    <h2>Modification d'un médicament</h2>
+    <button type="button" class="btn rounded-pill btn-success" (click)="retour()">Retour</button>
+    <div *ngIf="!erreur" class="alert alert-danger">{{ messageErreur }}</div>
+    <form class="form-horizontal" [formGroup]="medicamentForm" (ngSubmit)="modifierMedicament()">
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="libelle">Libelle:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="libelle" placeholder="Le libelle du médicament" name="libelle" formControlName="libelle" [(ngModel)]="medicament.libelle" required>
+                <div class="alert alert-danger" [hidden]="libelle.valid || libelle.pristine && !libelle.touched ">Le libelle est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="prixUnitaire">Prix unitaire:</label>
+            <div class="col-sm-10">
+                <input type="number" class="form-control " id="prixUnitaire" name="prixUnitaire " formControlName="prixUnitaire" [(ngModel)]="medicament.prixUnitaire" required>
+                <div class="alert alert-danger" [hidden]="prixUnitaire.valid || prixUnitaire.pristine && !prixUnitaire.touched">Le prix unitaire est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="quantite ">Quantité:</label>
+            <div class="col-sm-10">
+                <input type="number" class="form-control" id="quantite" name="quantite" formControlName="quantite" [(ngModel)]="medicament.quantite" required>
+                <div class="alert alert-danger" [hidden]="quantite.valid || quantite.pristine && !quantite.touched">La quantité est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="categorie ">Catégorie:</label>
+            <div class="col-sm-10">
+                <input type="text" class="form-control" id="categorie" placeholder="La categorie du médicament" name="categorie" formControlName="categorie" [(ngModel)]="medicament.categorie" required>
+                <div class="alert alert-danger" [hidden]="categorie.valid || categorie.pristine && !categorie.touched">La catégorie est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="control-label col-sm-2" for="datePeremption">Date peremption:</label>
+            <div class="col-sm-10 ">
+                <input type="date" class="form-control" id="datePeremption" name="datePeremption" formControlName="datePeremption" [(ngModel)]="medicament.datePeremption" required>
+                <div class="alert alert-danger" [hidden]="datePeremption.valid || datePeremption.pristine && !datePeremption.touched">La date est obligatoire</div>
+            </div>
+        </div>
+        <div class="form-group ">
+            <div class="col-sm-offset-2 col-sm-10">
+                <button type="submit" [disabled]="medicamentForm.invalid" class="btn btn-primary">Modifier</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div *ngIf="!voirPageDetail">
+    <h2>Détail d'un médicament</h2>
+    <button type="button" class="btn rounded-pill btn-success" (click)="retour()">Retour</button>
+    <div class="card-body">
+        <br>
+        <div class="col-xl-4 col-md-6 col-sm-12 mb-4 ">
+            <span style="font-weight: bold; ">Libelle: </span>
+            <span>{{ medicament.libelle }}</span>
+            <br>
+            <br>
+            <span style="font-weight: bold; ">Prix unitaire: </span>
+            <span>{{ medicament.prixUnitaire }}</span>
+            <br>
+            <br>
+            <span style="font-weight: bold; ">Quantité: </span>
+            <span>{{ medicament.quantite }}</span>
+            <br>
+            <br>
+            <span style="font-weight: bold; ">Catégorie: </span>
+            <span>{{ medicament.categorie }}</span>
+            <br>
+            <br>
+            <span style="font-weight: bold; ">Quantité: </span>
+            <span>{{ medicament.datePeremption }}</span>
+        </div>
+    </div>
+</div>
